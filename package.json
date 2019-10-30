@@ -6,9 +6,19 @@
   "dependencies": {
     "express": "^4.15.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-typescript": "^7.6.0",
+    "@types/jest": "^24.0.21",
+    "@types/node-fetch": "^2.5.2",
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0",
+    "node-fetch": "^2.6.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test-watch": "jest --watch",
     "dev": "node web.js"
   },
   "repository": {
