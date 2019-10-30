@@ -28,7 +28,7 @@ var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).map(ruleName =
 })
 
 app.get('*', function(request, response) {
-  var requestUrl = new URL(request.url, `${request.protocol}://${request.host}`)
+  var requestUrl = new URL(request.url, `${request.protocol}://${request.hostname}`)
 
   var requestUrlStr = requestUrl.toString()
   var rule = rules.find((r) => r.pattern.test(requestUrlStr) || r.pattern.test(request.path))
@@ -45,11 +45,13 @@ app.get('*', function(request, response) {
   
 
   var newUrl = new URL(request.url, baseUrl).toString()
-  console.log('No Match:', redirectStatus, requestUrl, '=>', newUrl)
+  console.log('No Match:', redirectStatus, requestUrlStr, '=>', newUrl)
   response.redirect(redirectStatus, newUrl);
 });
 
 app.listen(port, function() {
   console.log("Listening on " + port);
-  process.send('listening')
+  if (process.send) {
+    process.send('listening')
+  }
 });
