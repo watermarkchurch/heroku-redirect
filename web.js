@@ -10,7 +10,7 @@ var baseUrl = new URL(process.env.NEW_BASE_URL)
 var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).map(ruleName => {
   const rule = process.env[ruleName]
 
-  const [pattern, to, status] = rule.split(' ').map((s) => s.trim())
+  const [pattern, to, status, preserve] = rule.split(' ').map((s) => s.trim())
   let statusCode
   try {
     statusCode = parseInt(status)
@@ -18,18 +18,28 @@ var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).map(ruleName =
   }
   statusCode = statusCode || redirectStatus
 
-  return { pattern: pathToRegexp(pattern), to: new URL(to), status: statusCode, name: ruleName }
+  return {
+    pattern: pathToRegexp(pattern),
+    to,
+    preserve: preserve && preserve.toLowerCase() == 'preserve',
+    status: statusCode,
+    name: ruleName
+  }
 })
 
 app.get('*', function(request, response) {
-  var requestUrl = new URL(`${request.protocol}://${request.host}${request.path}`)
+  var requestUrl = new URL(request.url, `${request.protocol}://${request.host}`)
 
-  requestUrl = requestUrl.toString()
-  var rule = rules.find((r) => r.pattern.test(requestUrl) || r.pattern.test(request.path))
+  var requestUrlStr = requestUrl.toString()
+  var rule = rules.find((r) => r.pattern.test(requestUrlStr) || r.pattern.test(request.path))
   if (rule) {
-    var newUrl = new URL(rule.to).toString()
-    console.log('Match', rule.name, rule.status, requestUrl, '=>', newUrl)
-    response.redirect(rule.status, newUrl);
+    var newUrl = new URL(rule.to)
+    if (rule.preserve) {
+      newUrl.pathname = newUrl.pathname + request.path
+      newUrl.search = requestUrl.search
+    }
+    console.log('Match', rule.name, rule.status, requestUrlStr, '=>', newUrl.toString())
+    response.redirect(rule.status, newUrl.toString());
     return
   }
   
