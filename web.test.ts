@@ -95,6 +95,7 @@ describe('web', () => {
   it('redirects match preserving path and query', async () => {
     await forkIt({
       RULE_1: 'https?://wmfw.org/* https://www.watermark.org/fort-worth 302 preserve',
+      RULE_2: 'https?://watermarkfw.org/* https://www.watermarkfortworth.org 301 preserve',
     })
 
     const resp = await fetch('http://localhost:5000/test/a/b?q=some-search', {
@@ -105,7 +106,15 @@ describe('web', () => {
     })
 
     expect(resp.headers.get('Location')).toEqual('https://www.watermark.org/fort-worth/test/a/b?q=some-search')
-    expect(resp.status).toEqual(302)
+
+    const resp2 = await fetch('http://localhost:5000/test/a/b?q=some-search', {
+      headers: {
+        host: 'watermarkfw.org'
+      },
+      redirect: 'manual'
+    })
+
+    expect(resp2.headers.get('Location')).toEqual('https://www.watermarkfortworth.org/test/a/b?q=some-search')
   })
 
   function forkIt(env?: { [key: string]: string }): Promise<void> {

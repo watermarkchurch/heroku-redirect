@@ -35,7 +35,7 @@ app.get('*', function(request, response) {
   if (rule) {
     var newUrl = new URL(rule.to)
     if (rule.preserve) {
-      newUrl.pathname = newUrl.pathname + request.path
+      newUrl.pathname = newUrl.pathname.replace(/\/$/, '') + request.path
       newUrl.search = requestUrl.search
     }
     console.log('Match', rule.name, rule.status, requestUrlStr, '=>', newUrl.toString())
