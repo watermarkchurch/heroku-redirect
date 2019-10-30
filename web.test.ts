@@ -76,6 +76,22 @@ describe('web', () => {
     expect(resp2.status).toEqual(301)
   })
 
+  it('rules ordered by name', async () => {
+    await forkIt({
+      RULE_2: '* https://www.watermark.org/frisco',
+      RULE_1: 'https?://wmfw.org/* https://www.watermark.org/fort-worth',
+    })
+
+    const resp = await fetch('http://localhost:5000/test', {
+      headers: {
+        host: 'wmfw.org'
+      },
+      redirect: 'manual'
+    })
+
+    expect(resp.headers.get('Location')).toEqual('https://www.watermark.org/fort-worth')
+  })
+
   it('redirects match preserving path and query', async () => {
     await forkIt({
       RULE_1: 'https?://wmfw.org/* https://www.watermark.org/fort-worth 302 preserve',

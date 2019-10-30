@@ -7,7 +7,7 @@ var redirectStatus = parseInt(process.env.REDIRECT_STATUS || 301);
 var port = process.env.PORT || 5000;
 var baseUrl = new URL(process.env.NEW_BASE_URL)
 
-var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).map(ruleName => {
+var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).sort().map(ruleName => {
   const rule = process.env[ruleName]
 
   const [pattern, to, status, preserve] = rule.split(' ').map((s) => s.trim())
