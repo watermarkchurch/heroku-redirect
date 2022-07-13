@@ -98,14 +98,9 @@ describe('web', () => {
       RULE_2: 'https?://watermarkfw.org/* https://www.watermarkfortworth.org 301 preserve',
     })
 
-    const resp = await fetch('http://localhost:5000/test/a/b?q=some-search', {
-      headers: {
-        host: 'wmfw.org'
-      },
-      redirect: 'manual'
-    })
+    const { location } = await doFetch('https://wmfw.org/test/a/b?q=some-search')
 
-    expect(resp.headers.get('Location')).toEqual('https://www.watermark.org/fort-worth/test/a/b?q=some-search')
+    expect(location).toEqual('https://www.watermark.org/fort-worth/test/a/b?q=some-search')
 
     const resp2 = await fetch('http://localhost:5000/test/a/b?q=some-search', {
       headers: {
@@ -116,6 +111,24 @@ describe('web', () => {
 
     expect(resp2.headers.get('Location')).toEqual('https://www.watermarkfortworth.org/test/a/b?q=some-search')
   })
+
+  async function doFetch(url: string): Promise<{ location: string, status: number }> {
+    const parsed = new URL(url)
+    const resp = await fetch(`http://localhost:5000${parsed.pathname}${parsed.search}`, {
+      headers: {
+        host: parsed.host,
+      },
+      redirect: 'manual'
+    })
+
+    expect(resp.status).toBeLessThan(400)
+    expect(resp.status).toBeGreaterThan(299)
+
+    return {
+      location: resp.headers.get('Location'),
+      status: resp.status
+    }
+  }
 
   function forkIt(env?: { [key: string]: string }): Promise<void> {
     child = fork('./web', [], {
