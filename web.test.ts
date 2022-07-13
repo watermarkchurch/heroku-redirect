@@ -2,7 +2,7 @@ import { fork, ChildProcess } from 'child_process'
 import fetch from 'node-fetch'
 
 describe('web', () => {
-  let child: ChildProcess = null
+  let child: ChildProcess
 
   afterEach((done) => {
     child.kill()
@@ -125,7 +125,7 @@ describe('web', () => {
     expect(resp.status).toBeGreaterThan(299)
 
     return {
-      location: resp.headers.get('Location'),
+      location: resp.headers.get('Location')!,
       status: resp.status
     }
   }
