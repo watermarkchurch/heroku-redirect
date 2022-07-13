@@ -21,14 +21,11 @@
     "test-watch": "jest --watch",
     "dev": "node web.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kenmickles/heroku-redirect.git"
-  },
-  "author": "Ken Mickles <ken@37i.net>",
+  "repository": "ssh+git@github.com:watermarkchurch/heroku-redirect.git",
+  "author": "Watermark Dev <dev@watermark.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kenmickles/heroku-redirect/issues"
+    "url": "https://github.com/watermarkchurch/heroku-redirect/issues"
   },
-  "homepage": "https://github.com/kenmickles/heroku-redirect#readme"
+  "homepage": "https://github.com/watermarkchurch/heroku-redirect#readme"
 }
