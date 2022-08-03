@@ -7,7 +7,14 @@ var redirectStatus = parseInt(process.env.REDIRECT_STATUS || 301);
 var port = process.env.PORT || 5000;
 var baseUrl = new URL(process.env.NEW_BASE_URL)
 
-var rules = Object.keys(process.env).filter(k => /RULE_/.test(k)).sort().map(ruleName => {
+const RULE_REGEXP = /RULE_(\d+)/
+
+var rules = Object.keys(process.env)
+    .map(k => RULE_REGEXP.exec(k))
+    .filter((match) => match && match[0])
+    .map((match) => ({ ruleName: match[0], number: tryParseInt(match[1]) }))
+    .sort(byNumber)
+    .map(({ruleName, number}) => {
   const rule = process.env[ruleName]
 
   const [pattern, to, status, preserve] = rule.split(' ').map((s) => s.trim())
@@ -55,3 +62,15 @@ app.listen(port, function() {
     process.send('listening')
   }
 });
+
+function tryParseInt(str) {
+  try {
+    return parseInt(str)
+  } catch {
+    return
+  }
+}
+
+function byNumber(a, b) {
+  return a.number - b.number
+}
