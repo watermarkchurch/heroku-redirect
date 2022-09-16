@@ -138,6 +138,18 @@ describe('web', () => {
     expect(location).toEqual('https://www.watermarkfortworth.org/test/a/b?utm_source=wmfw.org&q=some-search')
   })
 
+  it('redirects do not pollute future search paths', async () => {
+    await forkIt({
+      RULE_1: 'https?://wmfw.org/* https://www.watermarkfortworth.org?utm_source=wmfw.org 302 preserve',
+    })
+
+    const {  } = await doFetch('https://wmfw.org/.htaccess?something=else')
+
+    const { location } = await doFetch('https://wmfw.org/test/a/b?q=some-search')
+
+    expect(location).toEqual('https://www.watermarkfortworth.org/test/a/b?utm_source=wmfw.org&q=some-search')
+  })
+
   async function doFetch(url: string): Promise<{ location: string, status: number }> {
     const parsed = new URL(url)
     const resp = await fetch(`http://localhost:5000${parsed.pathname}${parsed.search}`, {

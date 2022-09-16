@@ -27,7 +27,7 @@ var rules = Object.keys(process.env)
 
   return {
     pattern: pathToRegexp(pattern),
-    to: new URL(to),
+    to,
     preserve: preserve && preserve.toLowerCase() == 'preserve',
     status: statusCode,
     name: ruleName
@@ -36,11 +36,12 @@ var rules = Object.keys(process.env)
 
 app.get('*', function(request, response) {
   var requestUrl = new URL(request.url, `${request.protocol}://${request.hostname}`)
+  console.log('Incoming request', requestUrl.toString())
 
   var requestUrlStr = requestUrl.toString()
   var rule = rules.find((r) => r.pattern.test(requestUrlStr) || r.pattern.test(request.path))
   if (rule) {
-    var newUrl = rule.to
+    var newUrl = new URL(rule.to)
     if (rule.preserve) {
       newUrl.pathname = newUrl.pathname.replace(/\/$/, '') + request.path
       var ruleSearch = new URLSearchParams(newUrl.search)
