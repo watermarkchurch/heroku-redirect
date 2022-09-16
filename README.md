@@ -33,17 +33,29 @@ X-Powered-By: Express
 Location: https://www.example.com
 ```
 
-To preserve path and query info, set the "preserve" option
+To add a query parameter to the redirected location, simply set it in the destination url
+```
+$ heroku config:add RULE_1="https?//ex.com https://www.example.com?utm_source=ex.com 301"
+
+$ curl -I https://ex.com
+HTTP/1.1 301 Moved Permanently
+Server: Cowboy
+Connection: keep-alive
+X-Powered-By: Express
+Location: https://www.example.com?utm_source=ex.com
+```
+
+To preserve the path and query from the request, set the "preserve" option
 
 ```
-$ heroku config:add RULE_1="* https://www.example.com 302 preserve"
+$ heroku config:add RULE_1="* https://www.example.com?utm_source=ex.com 302 preserve"
 
-$ curl -I https://heroku-redirect.herokuapp.com/test
+$ curl -I https://heroku-redirect.herokuapp.com/test?q=something
 HTTP/1.1 302 Found
 Server: Cowboy
 Connection: keep-alive
 X-Powered-By: Express
-Location: https://www.example.com/test
+Location: https://www.example.com/test?utm_source=ex.com&q=something
 ```
 
 To differentiate by host (or even by path criteria) set multiple rules.
@@ -68,4 +80,4 @@ Location: https://www.example.com
 ```
 
 Matching is done using the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library.  The first
-matching rule in lexical order is used.
+matching rule in numerical order is used, i.e. `RULE_9` has precedence over `RULE_10`.
